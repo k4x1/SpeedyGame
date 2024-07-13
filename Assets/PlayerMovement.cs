@@ -16,6 +16,12 @@ public class PlayerMovement : MonoBehaviour
     
     public InputAction playerControls;
     public Vector2 moveDirection = Vector2.zero;
+    public float moveSpeed = 1f;
+    public float decayRate = 1f;
+
+    public Camera cameraRef;
+
+    public Vector3 acceleration;
 
     private void OnEnable()
     {
@@ -55,15 +61,30 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleMove()
     {
-        moveDirection = playerControls.ReadValue<Vector2>();
-        Vector3 move = transform.right * moveDirection.x + transform.forward * moveDirection.y;
-        rb.linearVelocity += move * Time.fixedDeltaTime;
+        Vector3 cameraForward = playerCamera.transform.forward;
+        cameraForward.Normalize();
+        acceleration = cameraForward * moveSpeed;
+        float cosineSim = CosineSimilarity(cameraForward, rb.linearVelocity);
+        float exponentialFactor = Mathf.Exp(-cosineSim* decayRate);
+
+        rb.linearVelocity += (acceleration * exponentialFactor) * Time.fixedDeltaTime;
+        Debug.Log(acceleration * exponentialFactor);
+    }
+
+
+
+    public static float CosineSimilarity(Vector3 a, Vector3 b)
+    {
+        float dotProduct = Vector3.Dot(a, b);
+        float magnitudeA = a.magnitude;
+        float magnitudeB = b.magnitude;
+        return (dotProduct / (magnitudeA * magnitudeB)+1)/2;
     }
 
     void Dash(Vector3 direction)
     {
-        rb.AddForce(direction.normalized * dashForce, ForceMode.Impulse);   
-        
+        rb.AddForce(direction.normalized * dashForce, ForceMode.Impulse);
+
         lastDashTime = Time.time;
     }
 }

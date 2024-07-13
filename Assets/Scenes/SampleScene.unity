@@ -206,7 +206,10 @@ MonoBehaviour:
       m_Flags: 8
     m_Flags: 0
   moveDirection: {x: 0, y: 0}
-  moveSpeed: 5
+  moveSpeed: 50
+  decayRate: 3.912
+  cameraRef: {fileID: 963194227}
+  acceleration: {x: 0, y: 0, z: 0}
 --- !u!54 &173564802
 Rigidbody:
   m_ObjectHideFlags: 0
